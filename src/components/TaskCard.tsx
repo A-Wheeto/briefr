@@ -77,7 +77,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
   if (editing) {
     return (
       <div
-        className="bg-white border border-slate-300 rounded-lg overflow-hidden shadow-sm"
+        className="bg-white dark:bg-gray-900 border border-slate-300 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm"
         tabIndex={-1}
         onBlur={(e) => {
           if (!e.currentTarget.contains(e.relatedTarget as Node)) save();
@@ -86,7 +86,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
         <div className="p-3">
           <input
             autoFocus
-            className="w-full text-sm text-gray-800 outline-none mb-2"
+            className="w-full text-sm text-gray-800 dark:text-gray-200 bg-transparent outline-none mb-2"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => {
@@ -96,7 +96,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
           />
           <textarea
             ref={textareaRef}
-            className="w-full text-xs text-gray-500 outline-none resize-none overflow-hidden"
+            className="w-full text-xs text-gray-500 dark:text-gray-400 bg-transparent outline-none resize-none overflow-hidden"
             rows={1}
             placeholder="Add notes..."
             value={notes}
@@ -127,16 +127,16 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
     <div ref={setNodeRef} style={style} {...attributes}>
       <div
         onClick={() => setEditing(true)}
-        className={`bg-white border rounded-lg overflow-hidden hover:shadow-sm transition-all ${
-          isDone ? "border-gray-100 opacity-60" : "border-gray-200 hover:border-gray-300"
+        className={`bg-white dark:bg-gray-900 border rounded-lg overflow-hidden hover:shadow-sm transition-all ${
+          isDone ? "border-gray-100 dark:border-gray-800 opacity-60" : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
         }`}
       >
       <div className="px-3 pt-3 pb-2 cursor-grab active:cursor-grabbing" {...listeners}>
-        <p className={`text-sm leading-snug ${isDone ? "text-gray-400" : "text-gray-700"}`}>
+        <p className={`text-sm leading-snug ${isDone ? "text-gray-400 dark:text-gray-600" : "text-gray-700 dark:text-gray-200"}`}>
           {task.title}
         </p>
         {task.notes && (
-          <p className="text-xs text-gray-400 mt-1 leading-snug line-clamp-2">{task.notes}</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 leading-snug line-clamp-2">{task.notes}</p>
         )}
       </div>
       <div className={`px-2 py-1.5 border-t flex items-center gap-1 ${footer.bg} ${footer.border}`}>

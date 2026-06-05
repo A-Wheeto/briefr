@@ -130,7 +130,7 @@ export default function Board() {
     >
       {/* Mobile: tab bar + single column */}
       <div className="flex flex-col h-full md:hidden">
-        <div className="flex border-b border-gray-200 bg-white overflow-x-auto flex-shrink-0">
+        <div className="flex border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-x-auto flex-shrink-0">
           {COLUMNS.map((col) => {
             const count = tasks.filter((t) => t.status === col.status).length;
             const isActive = activeTab === col.status;
@@ -140,8 +140,8 @@ export default function Board() {
                 onClick={() => setActiveTab(col.status)}
                 className={`flex-1 min-w-0 px-2 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
                   isActive
-                    ? "border-slate-600 text-slate-600"
-                    : "border-transparent text-gray-400 hover:text-gray-600"
+                    ? "border-slate-600 text-slate-600 dark:text-slate-400"
+                    : "border-transparent text-gray-400 hover:text-gray-600 dark:text-gray-600 dark:hover:text-gray-400"
                 }`}
               >
                 {col.title}

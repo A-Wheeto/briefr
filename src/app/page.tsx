@@ -8,7 +8,7 @@ export default async function Home() {
   if (!session) redirect("/login");
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-950">
       <Header />
       <main className="flex-1 overflow-x-auto overflow-y-hidden">
         <Board />

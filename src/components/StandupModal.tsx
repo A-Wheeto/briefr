@@ -37,11 +37,11 @@ export default function StandupModal({ onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl border border-gray-200 shadow-lg w-full max-w-md p-6"
+        className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-lg w-full max-w-md p-6"
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
               <path d="M2.5 5l2 2 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M9.5 5.5h4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
@@ -56,7 +56,7 @@ export default function StandupModal({ onClose }: Props) {
             </svg>
           </button>
         </div>
-        <p className="text-xs text-gray-400 mb-5">
+        <p className="text-xs text-gray-400 dark:text-gray-500 mb-5">
           {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
 
@@ -68,11 +68,11 @@ export default function StandupModal({ onClose }: Props) {
             completedYesterday.map(t => (
               <div key={t.id} className="flex items-start gap-2 py-1">
                 <span className="text-emerald-500 mt-0.5">•</span>
-                <span className="text-sm text-gray-700">{t.title}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{t.title}</span>
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-400 italic">Nothing completed yesterday</p>
+            <p className="text-sm text-gray-400 dark:text-gray-600 italic">Nothing completed yesterday</p>
           )}
         </div>
 
@@ -84,11 +84,11 @@ export default function StandupModal({ onClose }: Props) {
             inProgressToday.map(t => (
               <div key={t.id} className="flex items-start gap-2 py-1">
                 <span className="text-slate-500 mt-0.5">•</span>
-                <span className="text-sm text-gray-700">{t.title}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{t.title}</span>
               </div>
             ))
           ) : (
-            <p className="text-sm text-gray-400 italic">Nothing in progress</p>
+            <p className="text-sm text-gray-400 dark:text-gray-600 italic">Nothing in progress</p>
           )}
         </div>
 

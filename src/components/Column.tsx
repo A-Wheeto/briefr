@@ -23,14 +23,9 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-const accentClasses: Record<string, string> = {
-  IN_PROGRESS: "text-slate-600",
-  DONE: "text-emerald-600",
-};
-
 const countClasses: Record<string, string> = {
-  IN_PROGRESS: "bg-slate-100 text-slate-600",
-  DONE: "bg-emerald-50 text-emerald-600",
+  IN_PROGRESS: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400",
+  DONE: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-500",
 };
 
 export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete }: Props) {
@@ -51,12 +46,12 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg flex flex-col overflow-hidden min-w-0">
-      <div className="px-3 py-3 border-b border-gray-100 flex items-center gap-2 flex-shrink-0">
-        <span className={`text-xs font-semibold uppercase tracking-wide ${accentClasses[status] ?? "text-gray-400"}`}>
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg flex flex-col overflow-hidden min-w-0">
+      <div className="px-3 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center gap-2 flex-shrink-0">
+        <span className="text-xs font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-300">
           {title}
         </span>
-        <span className={`text-xs font-medium rounded-full px-2 py-0.5 ml-auto ${countClasses[status] ?? "bg-gray-100 text-gray-400"}`}>
+        <span className={`text-xs font-medium rounded-full px-2 py-0.5 ml-auto ${countClasses[status] ?? "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
           {tasks.length}
         </span>
       </div>
@@ -64,7 +59,7 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div
           ref={setNodeRef}
-          className={`flex-1 overflow-y-auto p-2 flex flex-col gap-2 transition-colors ${isOver ? "bg-slate-50" : ""}`}
+          className={`flex-1 overflow-y-auto p-2 flex flex-col gap-2 transition-colors ${isOver ? "bg-slate-50 dark:bg-gray-800" : ""}`}
         >
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
@@ -76,14 +71,14 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
         {adding ? (
           <div
             tabIndex={-1}
-            className="border border-slate-300 rounded-md p-2"
+            className="border border-slate-300 dark:border-gray-700 rounded-md p-2 dark:bg-gray-800"
             onBlur={(e) => {
               if (!e.currentTarget.contains(e.relatedTarget as Node)) submitAdd();
             }}
           >
             <input
               autoFocus
-              className="w-full text-sm outline-none text-gray-800"
+              className="w-full text-sm outline-none text-gray-800 dark:text-gray-200 bg-transparent"
               placeholder="Task title..."
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
@@ -96,7 +91,7 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
         ) : (
           <button
             onClick={() => setAdding(true)}
-            className="w-full text-xs text-gray-400 border border-dashed border-gray-200 rounded-md py-2 hover:border-gray-300 hover:text-gray-500 transition-colors"
+            className="w-full text-xs text-gray-400 dark:text-gray-600 border border-dashed border-gray-200 dark:border-gray-700 rounded-md py-2 hover:border-gray-300 hover:text-gray-500 dark:hover:border-gray-600 dark:hover:text-gray-500 transition-colors"
           >
             + Add task
           </button>

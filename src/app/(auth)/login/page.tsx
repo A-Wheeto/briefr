@@ -2,8 +2,8 @@ import { signIn } from "@/lib/auth";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white border border-gray-200 rounded-xl p-8 w-full max-w-sm shadow-sm">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-8 w-full max-w-sm shadow-sm">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -12,11 +12,11 @@ export default function LoginPage() {
               <rect x="11" y="2" width="7" height="4" rx="2" fill="#475569" fillOpacity="0.5"/>
               <rect x="11" y="8" width="7" height="4" rx="2" fill="#475569" fillOpacity="0.3"/>
             </svg>
-            <span className="font-semibold text-gray-900">Briefr</span>
+            <span className="font-semibold text-gray-900 dark:text-gray-100">Briefr</span>
           </div>
-          <p className="text-sm text-gray-500">Your daily work, summarised.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Your daily work, summarised.</p>
         </div>
-        <h1 className="text-xl font-semibold text-gray-900 mb-6">Sign in</h1>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Sign in</h1>
         <form action={async () => { "use server"; await signIn("github", { redirectTo: "/" }); }}>
           <button
             type="submit"

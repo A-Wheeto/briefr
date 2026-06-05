@@ -1,6 +1,7 @@
-import { auth, signOut } from "@/lib/auth"
+import { auth } from "@/lib/auth"
 import StandupButton from "./StandupButton"
 import ThemeToggle from "./ThemeToggle"
+import UserMenu from "./UserMenu"
 
 export default async function Header() {
   const session = await auth()
@@ -28,16 +29,11 @@ export default async function Header() {
 
       <StandupButton />
       <ThemeToggle />
-
-      <form action={async () => { "use server"; await signOut({ redirectTo: "/login" }) }}>
-        <button
-          type="submit"
-          title={session?.user?.name ?? ""}
-          className="w-8 h-8 rounded-full bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-600 dark:text-gray-400 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-gray-700 transition-colors"
-        >
-          {initials}
-        </button>
-      </form>
+      <UserMenu
+        name={session?.user?.name}
+        email={session?.user?.email}
+        initials={initials}
+      />
     </header>
   )
 }

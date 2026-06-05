@@ -47,6 +47,15 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
     opacity: isDragging ? 0.3 : 1,
   };
 
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  useEffect(() => {
+    if (!confirmingDelete) return;
+    function handleClickOutside() { setConfirmingDelete(false); }
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [confirmingDelete]);
+
   const isDone = task.status === "DONE";
   const footer = statusFooter[task.status] ?? statusFooter.BACKLOG;
   const colIndex = COLUMN_ORDER.indexOf(task.status);
@@ -139,54 +148,74 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
           <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 leading-snug line-clamp-2">{task.notes}</p>
         )}
       </div>
-      <div className={`px-2 py-1.5 border-t flex items-center gap-1 ${footer.bg} ${footer.border}`}>
-        <div className="md:hidden">
-          {prevStatus ? (
+      {confirmingDelete ? (
+        <div className="px-3 py-2 border-t border-red-100 dark:border-red-900 bg-red-50 dark:bg-red-950 flex items-center justify-between">
+          <span className="text-xs text-red-500 font-medium">Delete task?</span>
+          <div className="flex gap-1">
             <button
-              onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: prevStatus }); }}
-              className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+              onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+              className="px-2 py-1 text-xs font-medium bg-red-500 hover:bg-red-600 text-white rounded transition-colors"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              Delete
             </button>
-          ) : (
-            <div className="px-2 py-2 w-[32px]" />
-          )}
-        </div>
-
-        <span className={`text-xs font-medium flex-1 text-center ${footer.text}`}>
-          {footer.label}
-          {isDone && task.completedAt && ` · ${formatDate(task.completedAt)}`}
-        </span>
-
-        <div className="md:hidden">
-          {nextStatus ? (
             <button
-              onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: nextStatus }); }}
-              className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+              onClick={(e) => { e.stopPropagation(); setConfirmingDelete(false); }}
+              className="px-2 py-1 text-xs font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 rounded hover:bg-gray-50 transition-colors"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              Cancel
             </button>
-          ) : (
-            <div className="px-2 py-2 w-[32px]" />
-          )}
+          </div>
         </div>
+      ) : (
+        <div className={`px-2 py-1.5 border-t flex items-center gap-1 ${footer.bg} ${footer.border}`}>
+          <div className="md:hidden">
+            {prevStatus ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: prevStatus }); }}
+                className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            ) : (
+              <div className="px-2 py-2 w-[32px]" />
+            )}
+          </div>
 
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-          className="px-2 py-2 text-gray-300 hover:text-red-400 transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M3 4h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            <path d="M6 4V3h4v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <rect x="4" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M6.5 7.5v3M9.5 7.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </button>
-      </div>
+          <span className={`text-xs font-medium flex-1 text-center ${footer.text}`}>
+            {footer.label}
+            {isDone && task.completedAt && ` · ${formatDate(task.completedAt)}`}
+          </span>
+
+          <div className="md:hidden">
+            {nextStatus ? (
+              <button
+                onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: nextStatus }); }}
+                className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            ) : (
+              <div className="px-2 py-2 w-[32px]" />
+            )}
+          </div>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setConfirmingDelete(true); }}
+            className="px-2 py-2 text-gray-300 hover:text-red-400 transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <path d="M3 4h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M6 4V3h4v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="4" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M6.5 7.5v3M9.5 7.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+      )}
       </div>
     </div>
   );

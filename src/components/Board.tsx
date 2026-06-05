@@ -10,7 +10,9 @@ import {
   closestCorners,
   DragStartEvent,
   DragEndEvent,
+  DragOverEvent,
 } from "@dnd-kit/core";
+import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./Column";
 import TaskCard from "./TaskCard";
 import BoardSkeleton from "./BoardSkeleton";
@@ -87,38 +89,51 @@ export default function Board() {
     setActiveTask(task ?? null);
   }
 
-  function handleDragEnd(event: DragEndEvent) {
+  function handleDragOver(event: DragOverEvent) {
     const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const activeTask = tasks.find((t) => t.id === active.id);
+    if (!activeTask) return;
+
+    const overTask = tasks.find((t) => t.id === over.id);
+    const targetStatus = overTask ? overTask.status : (over.id as string);
+
+    if (activeTask.status !== targetStatus) {
+      // Moving to a different column
+      setTasks((prev) =>
+        prev.map((t) => (t.id === active.id ? { ...t, status: targetStatus } : t))
+      );
+    } else if (overTask) {
+      // Reordering within the same column
+      setTasks((prev) => {
+        const activeIndex = prev.findIndex((t) => t.id === active.id);
+        const overIndex = prev.findIndex((t) => t.id === over.id);
+        return arrayMove(prev, activeIndex, overIndex);
+      });
+    }
+  }
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active } = event;
     setActiveTask(null);
-    if (!over) return;
 
     const task = tasks.find((t) => t.id === active.id);
     if (!task) return;
 
-    // over.id is either a task id or a column status
-    const overTask = tasks.find((t) => t.id === over.id);
-    const targetStatus = overTask ? overTask.status : (over.id as string);
-
-    // Get ordered tasks in the target column excluding the dragged task
-    const columnTasks = tasks
-      .filter((t) => t.status === targetStatus && t.id !== active.id)
-      .sort((a, b) => a.position - b.position);
+    // Calculate position from neighbours in the current (reordered) tasks array
+    const columnTasks = tasks.filter((t) => t.status === task.status);
+    const index = columnTasks.findIndex((t) => t.id === active.id);
+    const prev = columnTasks[index - 1];
+    const next = columnTasks[index + 1];
 
     let newPosition: number;
-    if (overTask) {
-      const overIndex = columnTasks.findIndex((t) => t.id === over.id);
-      const prev = columnTasks[overIndex - 1];
-      const next = columnTasks[overIndex];
-      if (!prev) newPosition = (next?.position ?? 1000) / 2;
-      else if (!next) newPosition = prev.position + 1000;
-      else newPosition = (prev.position + next.position) / 2;
-    } else {
-      newPosition = (columnTasks[columnTasks.length - 1]?.position ?? 0) + 1000;
-    }
+    if (!prev && !next) newPosition = 1000;
+    else if (!prev) newPosition = next.position / 2;
+    else if (!next) newPosition = prev.position + 1000;
+    else newPosition = (prev.position + next.position) / 2;
 
-    if (targetStatus !== task.status || newPosition !== task.position) {
-      handleUpdate(task.id, { status: targetStatus, position: newPosition });
-    }
+    handleUpdate(task.id, { status: task.status, position: newPosition });
   }
 
   const columnProps = {
@@ -134,6 +149,7 @@ export default function Board() {
       sensors={sensors}
       collisionDetection={closestCorners}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       {/* Mobile: tab bar + single column */}

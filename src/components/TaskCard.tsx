@@ -35,7 +35,7 @@ function formatDate(iso: string) {
 }
 
 function formatAge(iso: string): string {
-  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  const days = Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000));
   if (days === 0) return "Today";
   if (days === 1) return "1 day";
   if (days < 7) return `${days} days`;

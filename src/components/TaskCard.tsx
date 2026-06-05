@@ -23,11 +23,11 @@ type Props = {
 const COLUMN_ORDER = ["BACKLOG", "TODO", "IN_PROGRESS", "REVIEW", "DONE"];
 
 const statusFooter: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  BACKLOG:     { label: "Backlog",     bg: "bg-gray-50",    text: "text-gray-400",   border: "border-gray-100" },
-  TODO:        { label: "Todo",        bg: "bg-gray-50",    text: "text-gray-400",   border: "border-gray-100" },
-  IN_PROGRESS: { label: "In Progress", bg: "bg-slate-50",  text: "text-slate-600", border: "border-slate-100" },
-  REVIEW:      { label: "Review",      bg: "bg-amber-50",   text: "text-amber-600",  border: "border-amber-100" },
-  DONE:        { label: "Done",        bg: "bg-emerald-50", text: "text-emerald-600",border: "border-emerald-100" },
+  BACKLOG:     { label: "Backlog",     bg: "bg-gray-50 dark:bg-gray-800",    text: "text-gray-400 dark:text-gray-500",   border: "border-gray-100 dark:border-gray-700" },
+  TODO:        { label: "Todo",        bg: "bg-gray-50 dark:bg-gray-800",    text: "text-gray-400 dark:text-gray-500",   border: "border-gray-100 dark:border-gray-700" },
+  IN_PROGRESS: { label: "In Progress", bg: "bg-slate-50 dark:bg-gray-800",  text: "text-slate-600 dark:text-slate-400", border: "border-slate-100 dark:border-gray-700" },
+  REVIEW:      { label: "Review",      bg: "bg-amber-50 dark:bg-gray-800",   text: "text-amber-600 dark:text-amber-500",  border: "border-amber-100 dark:border-gray-700" },
+  DONE:        { label: "Done",        bg: "bg-emerald-50 dark:bg-gray-800", text: "text-emerald-600 dark:text-emerald-500", border: "border-emerald-100 dark:border-gray-700" },
 };
 
 function formatDate(iso: string) {

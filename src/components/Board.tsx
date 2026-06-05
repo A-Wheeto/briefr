@@ -13,6 +13,7 @@ import {
 } from "@dnd-kit/core";
 import Column from "./Column";
 import TaskCard from "./TaskCard";
+import BoardSkeleton from "./BoardSkeleton";
 
 type Task = {
   id: string;
@@ -33,6 +34,7 @@ const COLUMNS = [
 
 export default function Board() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("IN_PROGRESS");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -45,7 +47,10 @@ export default function Board() {
   useEffect(() => {
     fetch("/api/tasks")
       .then((r) => r.json())
-      .then(setTasks);
+      .then((data) => {
+        setTasks(data);
+        setLoading(false);
+      });
   }, []);
 
   async function handleAdd(title: string, status: string) {
@@ -120,6 +125,8 @@ export default function Board() {
     onUpdate: handleUpdate,
     onDelete: handleDelete,
   };
+
+  if (loading) return <BoardSkeleton />;
 
   return (
     <DndContext

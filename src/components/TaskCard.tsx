@@ -17,6 +17,8 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
+const COLUMN_ORDER = ["BACKLOG", "TODO", "IN_PROGRESS", "REVIEW", "DONE"];
+
 const statusFooter: Record<string, { label: string; bg: string; text: string; border: string }> = {
   BACKLOG:     { label: "Backlog",     bg: "bg-gray-50",    text: "text-gray-400",   border: "border-gray-100" },
   TODO:        { label: "Todo",        bg: "bg-gray-50",    text: "text-gray-400",   border: "border-gray-100" },
@@ -36,6 +38,9 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
 
   const isDone = task.status === "DONE";
   const footer = statusFooter[task.status] ?? statusFooter.BACKLOG;
+  const colIndex = COLUMN_ORDER.indexOf(task.status);
+  const prevStatus = colIndex > 0 ? COLUMN_ORDER[colIndex - 1] : null;
+  const nextStatus = colIndex < COLUMN_ORDER.length - 1 ? COLUMN_ORDER[colIndex + 1] : null;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -122,16 +127,43 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
           <p className="text-xs text-gray-400 mt-1 leading-snug line-clamp-2">{task.notes}</p>
         )}
       </div>
-      <div className={`px-3 py-1.5 border-t flex items-center justify-between ${footer.bg} ${footer.border}`}>
-        <span className={`text-xs font-medium ${footer.text}`}>
+      <div className={`px-2 py-1.5 border-t flex items-center gap-1 ${footer.bg} ${footer.border}`}>
+        {prevStatus ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: prevStatus }); }}
+            className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        ) : (
+          <div className="px-2 py-2 w-[32px]" />
+        )}
+
+        <span className={`text-xs font-medium flex-1 text-center ${footer.text}`}>
           {footer.label}
           {isDone && task.completedAt && ` · ${formatDate(task.completedAt)}`}
         </span>
+
+        {nextStatus ? (
+          <button
+            onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: nextStatus }); }}
+            className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        ) : (
+          <div className="px-2 py-2 w-[32px]" />
+        )}
+
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
-          className="text-gray-300 hover:text-red-400 transition-colors"
+          className="px-2 py-2 text-gray-300 hover:text-red-400 transition-colors"
         >
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3 4h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
             <path d="M6 4V3h4v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             <rect x="4" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>

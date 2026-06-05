@@ -22,10 +22,10 @@ export default function StandupModal({ onClose }: Props) {
     fetch("/api/tasks").then(r => r.json()).then(setTasks)
   }, [])
 
-  const { completedYesterday, inProgressToday } = getStandupTasks(tasks)
+  const { completedToday, completedYesterday, inProgressToday } = getStandupTasks(tasks)
 
   async function copyToClipboard() {
-    const text = formatStandupText(completedYesterday, inProgressToday)
+    const text = formatStandupText(completedToday, completedYesterday, inProgressToday)
     await navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -60,8 +60,22 @@ export default function StandupModal({ onClose }: Props) {
           {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
 
+        {completedToday.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+              Completed today
+            </p>
+            {completedToday.map(t => (
+              <div key={t.id} className="flex items-start gap-2 py-1">
+                <span className="text-emerald-500 mt-0.5">•</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{t.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
             Yesterday I completed
           </p>
           {completedYesterday.length > 0 ? (
@@ -77,7 +91,7 @@ export default function StandupModal({ onClose }: Props) {
         </div>
 
         <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
             Today I&apos;m working on
           </p>
           {inProgressToday.length > 0 ? (

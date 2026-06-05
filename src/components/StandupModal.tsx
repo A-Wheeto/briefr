@@ -60,20 +60,6 @@ export default function StandupModal({ onClose }: Props) {
           {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
 
-        {completedToday.length > 0 && (
-          <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
-              Completed today
-            </p>
-            {completedToday.map(t => (
-              <div key={t.id} className="flex items-start gap-2 py-1">
-                <span className="text-emerald-500 mt-0.5">•</span>
-                <span className="text-sm text-gray-700 dark:text-gray-300">{t.title}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
         <div className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
             Yesterday I completed
@@ -89,6 +75,20 @@ export default function StandupModal({ onClose }: Props) {
             <p className="text-sm text-gray-400 dark:text-gray-600 italic">Nothing completed yesterday</p>
           )}
         </div>
+
+        {completedToday.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+              Today I&apos;ve completed
+            </p>
+            {completedToday.map(t => (
+              <div key={t.id} className="flex items-start gap-2 py-1">
+                <span className="text-emerald-500 mt-0.5">•</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{t.title}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="mb-5">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">

@@ -22,9 +22,7 @@ export function getStandupTasks(tasks: Task[]) {
     return d >= yesterdayStart && d < todayStart
   })
 
-  const inProgressToday = tasks.filter(t =>
-    t.status === "IN_PROGRESS" || t.status === "REVIEW"
-  )
+  const inProgressToday = tasks.filter(t => t.status === "IN_PROGRESS")
 
   return { completedToday, completedYesterday, inProgressToday }
 }
@@ -40,17 +38,17 @@ export function formatStandupText(
 
   const lines = [`📋 Briefr — ${date}`, ""]
 
-  if (completedToday.length > 0) {
-    lines.push("Completed today:")
-    completedToday.forEach(t => lines.push(`• ${t.title}`))
-    lines.push("")
-  }
-
   lines.push("Yesterday I completed:")
   if (completedYesterday.length > 0) {
     completedYesterday.forEach(t => lines.push(`• ${t.title}`))
   } else {
     lines.push("• Nothing completed yesterday")
+  }
+
+  if (completedToday.length > 0) {
+    lines.push("")
+    lines.push("Today I've completed:")
+    completedToday.forEach(t => lines.push(`• ${t.title}`))
   }
 
   lines.push("")

@@ -1,14 +1,15 @@
-import { auth, signOut } from "@/lib/auth";
+import { auth, signOut } from "@/lib/auth"
+import StandupButton from "./StandupButton"
 
 export default async function Header() {
-  const session = await auth();
+  const session = await auth()
   const initials =
     session?.user?.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
       .toUpperCase()
-      .slice(0, 2) ?? "?";
+      .slice(0, 2) ?? "?"
 
   return (
     <header className="h-13 bg-white border-b border-gray-200 flex items-center px-4 gap-3 flex-shrink-0">
@@ -24,11 +25,9 @@ export default async function Header() {
 
       <div className="flex-1" />
 
-      <button className="bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium px-3 py-1.5 rounded-md transition-colors">
-        ☀️ Standup
-      </button>
+      <StandupButton />
 
-      <form action={async () => { "use server"; await signOut({ redirectTo: "/login" }); }}>
+      <form action={async () => { "use server"; await signOut({ redirectTo: "/login" }) }}>
         <button
           type="submit"
           title={session?.user?.name ?? ""}
@@ -38,5 +37,5 @@ export default async function Header() {
         </button>
       </form>
     </header>
-  );
+  )
 }

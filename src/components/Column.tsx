@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
 import TaskCard from "./TaskCard";
 
 type Task = {
@@ -27,13 +29,15 @@ const accentClasses: Record<string, string> = {
 };
 
 const countClasses: Record<string, string> = {
-  IN_PROGRESS: "bg-slate-50 text-slate-600",
+  IN_PROGRESS: "bg-slate-100 text-slate-600",
   DONE: "bg-emerald-50 text-emerald-600",
 };
 
 export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete }: Props) {
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+
+  const { setNodeRef, isOver } = useDroppable({ id: status });
 
   function submitAdd() {
     if (newTitle.trim()) onAdd(newTitle.trim(), status);
@@ -57,11 +61,16 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2 flex flex-col gap-2">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
-        ))}
-      </div>
+      <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+        <div
+          ref={setNodeRef}
+          className={`flex-1 overflow-y-auto p-2 flex flex-col gap-2 transition-colors ${isOver ? "bg-slate-50" : ""}`}
+        >
+          {tasks.map((task) => (
+            <TaskCard key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
+          ))}
+        </div>
+      </SortableContext>
 
       <div className="p-2 flex-shrink-0">
         {adding ? (

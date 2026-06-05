@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type Task = {
   id: string;
@@ -35,6 +37,15 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [notes, setNotes] = useState(task.notes ?? "");
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.3 : 1,
+  };
 
   const isDone = task.status === "DONE";
   const footer = statusFooter[task.status] ?? statusFooter.BACKLOG;
@@ -113,13 +124,14 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
   }
 
   return (
-    <div
-      onClick={() => setEditing(true)}
-      className={`bg-white border rounded-lg overflow-hidden cursor-pointer hover:shadow-sm transition-all ${
-        isDone ? "border-gray-100 opacity-60" : "border-gray-200 hover:border-gray-300"
-      }`}
-    >
-      <div className="px-3 pt-3 pb-2">
+    <div ref={setNodeRef} style={style} {...attributes}>
+      <div
+        onClick={() => setEditing(true)}
+        className={`bg-white border rounded-lg overflow-hidden hover:shadow-sm transition-all ${
+          isDone ? "border-gray-100 opacity-60" : "border-gray-200 hover:border-gray-300"
+        }`}
+      >
+      <div className="px-3 pt-3 pb-2 cursor-grab active:cursor-grabbing" {...listeners}>
         <p className={`text-sm leading-snug ${isDone ? "text-gray-400" : "text-gray-700"}`}>
           {task.title}
         </p>
@@ -128,36 +140,40 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
         )}
       </div>
       <div className={`px-2 py-1.5 border-t flex items-center gap-1 ${footer.bg} ${footer.border}`}>
-        {prevStatus ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: prevStatus }); }}
-            className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        ) : (
-          <div className="px-2 py-2 w-[32px]" />
-        )}
+        <div className="md:hidden">
+          {prevStatus ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: prevStatus }); }}
+              className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          ) : (
+            <div className="px-2 py-2 w-[32px]" />
+          )}
+        </div>
 
         <span className={`text-xs font-medium flex-1 text-center ${footer.text}`}>
           {footer.label}
           {isDone && task.completedAt && ` · ${formatDate(task.completedAt)}`}
         </span>
 
-        {nextStatus ? (
-          <button
-            onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: nextStatus }); }}
-            className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-        ) : (
-          <div className="px-2 py-2 w-[32px]" />
-        )}
+        <div className="md:hidden">
+          {nextStatus ? (
+            <button
+              onClick={(e) => { e.stopPropagation(); onUpdate(task.id, { status: nextStatus }); }}
+              className={`px-2 py-2 rounded transition-colors ${footer.text} hover:opacity-70`}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          ) : (
+            <div className="px-2 py-2 w-[32px]" />
+          )}
+        </div>
 
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
@@ -170,6 +186,7 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
             <path d="M6.5 7.5v3M9.5 7.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
         </button>
+      </div>
       </div>
     </div>
   );

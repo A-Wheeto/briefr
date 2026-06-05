@@ -16,10 +16,13 @@ type Props = {
 
 export default function StandupModal({ onClose }: Props) {
   const [tasks, setTasks] = useState<Task[]>([])
+  const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    fetch("/api/tasks").then(r => r.json()).then(setTasks)
+    fetch("/api/tasks")
+      .then(r => r.json())
+      .then(data => { setTasks(data); setLoading(false) })
   }, [])
 
   const { completedToday, completedYesterday, inProgressToday } = getStandupTasks(tasks)
@@ -60,6 +63,18 @@ export default function StandupModal({ onClose }: Props) {
           {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}
         </p>
 
+        {loading ? (
+          <div className="space-y-4 mb-5">
+            {[1, 2, 3].map(i => (
+              <div key={i}>
+                <div className="h-2.5 w-24 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse mb-3" />
+                <div className={`h-3 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse mb-2 ${i === 1 ? "w-3/4" : i === 2 ? "w-1/2" : "w-2/3"}`} />
+                <div className={`h-3 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse ${i === 1 ? "w-1/2" : i === 2 ? "w-3/4" : "w-1/3"}`} />
+              </div>
+            ))}
+          </div>
+        ) : (
+        <>
         <div className="mb-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
             Yesterday I completed
@@ -108,10 +123,13 @@ export default function StandupModal({ onClose }: Props) {
 
         <button
           onClick={copyToClipboard}
-          className="w-full bg-slate-700 hover:bg-slate-800 text-white text-sm font-medium rounded-lg py-2.5 transition-colors"
+          disabled={loading}
+          className="w-full bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white text-sm font-medium rounded-lg py-2.5 transition-colors"
         >
           {copied ? "✓ Copied!" : "📋 Copy to clipboard"}
         </button>
+        </>
+        )}
       </div>
     </div>
   )

@@ -12,6 +12,7 @@ type Task = {
   status: string;
   position: number;
   completedAt: string | null;
+  createdAt: string;
 };
 
 type Props = {

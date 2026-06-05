@@ -11,6 +11,7 @@ type Task = {
   status: string;
   position: number;
   completedAt: string | null;
+  createdAt: string;
 };
 
 type Props = {
@@ -31,6 +32,17 @@ const statusFooter: Record<string, { label: string; bg: string; text: string; bo
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
+function formatAge(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  if (days === 0) return "Today";
+  if (days === 1) return "1 day";
+  if (days < 7) return `${days} days`;
+  const weeks = Math.floor(days / 7);
+  if (days < 30) return weeks === 1 ? "1 week" : `${weeks} weeks`;
+  const months = Math.floor(days / 30);
+  return months === 1 ? "1 month" : `${months} months`;
 }
 
 export default function TaskCard({ task, onUpdate, onDelete }: Props) {
@@ -183,9 +195,10 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
             )}
           </div>
 
-          <span className={`text-xs font-medium flex-1 text-center ${footer.text}`}>
-            {footer.label}
-            {isDone && task.completedAt && ` · ${formatDate(task.completedAt)}`}
+          <span className={`text-xs flex-1 text-center ${footer.text}`}>
+            {isDone && task.completedAt
+              ? `Done · ${formatDate(task.completedAt)}`
+              : `${footer.label} · ${formatAge(task.createdAt)}`}
           </span>
 
           <div className="md:hidden">

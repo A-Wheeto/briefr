@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import TaskCard from "./TaskCard";
+import TaskModal from "./TaskModal";
 
 type Task = {
   id: string;
@@ -23,6 +24,7 @@ type Props = {
   onAdd: (title: string, status: string) => void;
   onUpdate: (id: string, data: Partial<Task>) => void;
   onDelete: (id: string) => void;
+  archiveAfterDays?: number;
 };
 
 const countClasses: Record<string, string> = {
@@ -30,11 +32,23 @@ const countClasses: Record<string, string> = {
   DONE: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-500",
 };
 
-export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete }: Props) {
+export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete, archiveAfterDays }: Props) {
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [archiveExpanded, setArchiveExpanded] = useState(false);
+  const [viewingTask, setViewingTask] = useState<Task | null>(null);
 
   const { setNodeRef, isOver } = useDroppable({ id: status });
+
+  const thresholdMs = status === "DONE" && archiveAfterDays != null
+    ? archiveAfterDays * 86400000
+    : null;
+  const activeTasks = thresholdMs != null
+    ? tasks.filter(t => !t.completedAt || Date.now() - new Date(t.completedAt).getTime() <= thresholdMs)
+    : tasks;
+  const archivedTasks = thresholdMs != null
+    ? tasks.filter(t => !!t.completedAt && Date.now() - new Date(t.completedAt).getTime() > thresholdMs)
+    : [];
 
   function submitAdd() {
     if (newTitle.trim()) onAdd(newTitle.trim(), status);
@@ -54,20 +68,68 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
           {title}
         </span>
         <span className={`text-xs font-medium rounded-full px-2 py-0.5 ml-auto ${countClasses[status] ?? "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"}`}>
-          {tasks.length}
+          {activeTasks.length}
         </span>
       </div>
 
-      <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={activeTasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div
           ref={setNodeRef}
           className={`flex-1 overflow-y-auto p-2 flex flex-col gap-2 transition-colors ${isOver ? "bg-slate-50 dark:bg-gray-800" : ""}`}
         >
-          {tasks.map((task) => (
+          {activeTasks.map((task) => (
             <TaskCard key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
           ))}
         </div>
       </SortableContext>
+
+      {archivedTasks.length > 0 && (
+        <div className="px-2 pb-1 flex-shrink-0">
+          <button
+            onClick={() => setArchiveExpanded(prev => !prev)}
+            className="w-full text-left text-xs text-gray-400 dark:text-gray-600 py-1.5 px-1 hover:text-gray-500 dark:hover:text-gray-500 transition-colors"
+          >
+            {archivedTasks.length} archived {archiveExpanded ? "↑" : "↓"}
+          </button>
+          {archiveExpanded && (
+            <div className="flex flex-col gap-1 mt-0.5">
+              {archivedTasks.map(task => (
+                <div
+                  key={task.id}
+                  className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-md px-2.5 py-1.5"
+                >
+                  <button
+                    onClick={() => setViewingTask(task)}
+                    className="text-xs text-gray-400 dark:text-gray-500 text-left truncate flex-1 hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+                  >
+                    {task.title}
+                  </button>
+                  <button
+                    onClick={() => onDelete(task.id)}
+                    className="text-gray-300 dark:text-gray-700 hover:text-red-400 flex-shrink-0 transition-colors"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+                      <path d="M3 4h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                      <path d="M6 4V3h4v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <rect x="4" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+                      <path d="M6.5 7.5v3M9.5 7.5v3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {viewingTask && (
+        <TaskModal
+          task={viewingTask}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+          onClose={() => setViewingTask(null)}
+        />
+      )}
 
       <div className="p-2 flex-shrink-0">
         {adding ? (

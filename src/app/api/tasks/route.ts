@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       status,
       position,
       completedAt: status === "DONE" ? new Date() : null,
+      statusChangedAt: new Date(),
     },
   });
 

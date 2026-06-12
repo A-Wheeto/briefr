@@ -12,6 +12,7 @@ type Task = {
   status: string;
   position: number;
   completedAt: string | null;
+  statusChangedAt: string | null;
   createdAt: string;
 };
 

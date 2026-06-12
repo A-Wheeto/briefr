@@ -28,9 +28,12 @@ export async function PATCH(
     completedAt = new Date();
   else if (body.status && body.status !== "DONE") completedAt = null;
 
+  let statusChangedAt = task.statusChangedAt;
+  if (body.status && body.status !== task.status) statusChangedAt = new Date();
+
   const updated = await prisma.task.update({
     where: { id },
-    data: { ...body, completedAt },
+    data: { ...body, completedAt, statusChangedAt },
   });
 
   return NextResponse.json(updated);

@@ -89,6 +89,9 @@ export default function Board() {
       if (e.key === "hasSeenOnboarding" && e.newValue) {
         setShowOnboarding(false);
       }
+      if (e.key === "showKeyboardHelp" && e.newValue !== null) {
+        setHelpOpen(true);
+      }
     }
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);

@@ -65,6 +65,19 @@ export default function UserMenu({ name, email, initials }: Props) {
             </svg>
             Show welcome guide
           </button>
+          <button
+            onClick={() => {
+              window.dispatchEvent(new StorageEvent("storage", { key: "showKeyboardHelp", newValue: "true" }));
+              setOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <rect x="1.5" y="4" width="13" height="8.5" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M4 6.5h.01M7 6.5h.01M10 6.5h.01M12 6.5h.01M4 9h.01M12 9h.01M6 9h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Keyboard shortcuts
+          </button>
           <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
             <span className="text-sm text-gray-600 dark:text-gray-400">Archive after</span>
             <select

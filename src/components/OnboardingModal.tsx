@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type Props = {
   onClose: () => void
@@ -10,11 +10,16 @@ export default function OnboardingModal({ onClose }: Props) {
   const [step, setStep] = useState(0)
   const totalSteps = 3
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   return (
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
-      onKeyDown={e => { if (e.key === "Escape") onClose() }}
     >
       <div
         className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xl w-full max-w-md flex flex-col"

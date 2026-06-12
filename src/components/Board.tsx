@@ -43,9 +43,7 @@ export default function Board() {
   const [activeTab, setActiveTab] = useState("IN_PROGRESS");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [archiveAfterDays, setArchiveAfterDays] = useState(7);
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => typeof window !== "undefined" && !localStorage.getItem("hasSeenOnboarding")
-  );
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -68,12 +66,19 @@ export default function Board() {
   }, []);
 
   useEffect(() => {
+    if (!localStorage.getItem("hasSeenOnboarding")) setShowOnboarding(true);
+  }, []);
+
+  useEffect(() => {
     function handleStorage(e: StorageEvent) {
       if (e.key === "archiveAfterDays" && e.newValue) {
         setArchiveAfterDays(Number(e.newValue));
       }
       if (e.key === "showOnboarding" && e.newValue !== null) {
         setShowOnboarding(true);
+      }
+      if (e.key === "hasSeenOnboarding" && e.newValue) {
+        setShowOnboarding(false);
       }
     }
     window.addEventListener("storage", handleStorage);
@@ -171,14 +176,10 @@ export default function Board() {
     onDelete: handleDelete,
   };
 
-  if (loading) return (
-    <>
-      <BoardSkeleton />
-      {showOnboarding && <OnboardingModal onClose={handleOnboardingClose} />}
-    </>
-  );
+  if (loading) return <BoardSkeleton />;
 
   return (
+    <>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}
@@ -252,9 +253,8 @@ export default function Board() {
         )}
       </DragOverlay>
 
-      {showOnboarding && (
-        <OnboardingModal onClose={handleOnboardingClose} />
-      )}
     </DndContext>
+    {showOnboarding && <OnboardingModal onClose={handleOnboardingClose} />}
+    </>
   );
 }

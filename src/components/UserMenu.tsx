@@ -11,6 +11,7 @@ type Props = {
 
 export default function UserMenu({ name, email, initials }: Props) {
   const [open, setOpen] = useState(false);
+  const [archiveDays, setArchiveDays] = useState(7);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,6 +23,18 @@ export default function UserMenu({ name, email, initials }: Props) {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("archiveAfterDays");
+    if (stored) setArchiveDays(Number(stored));
+  }, []);
+
+  function handleArchiveDaysChange(value: string) {
+    const days = Number(value);
+    setArchiveDays(days);
+    localStorage.setItem("archiveAfterDays", value);
+    window.dispatchEvent(new StorageEvent("storage", { key: "archiveAfterDays", newValue: value }));
+  }
 
   return (
     <div className="relative" ref={ref}>
@@ -37,6 +50,20 @@ export default function UserMenu({ name, email, initials }: Props) {
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
             {name && <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{name}</p>}
             {email && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{email}</p>}
+          </div>
+          <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
+            <span className="text-sm text-gray-600 dark:text-gray-400">Archive after</span>
+            <select
+              value={archiveDays}
+              onChange={e => handleArchiveDaysChange(e.target.value)}
+              className="text-xs border border-gray-200 dark:border-gray-700 rounded px-1.5 py-0.5 bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 outline-none cursor-pointer"
+            >
+              <option value={1}>1 day</option>
+              <option value={3}>3 days</option>
+              <option value={7}>7 days</option>
+              <option value={14}>14 days</option>
+              <option value={30}>30 days</option>
+            </select>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}

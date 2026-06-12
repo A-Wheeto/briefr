@@ -117,6 +117,7 @@ export default function TaskModal({ task, onUpdate, onDelete, onClose }: Props) 
             placeholder="Add notes..."
             value={notes}
             onChange={e => setNotes(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) save() }}
           />
         </div>
 

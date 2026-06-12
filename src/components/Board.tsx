@@ -41,6 +41,7 @@ export default function Board() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("IN_PROGRESS");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [archiveAfterDays, setArchiveAfterDays] = useState(7);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -55,6 +56,21 @@ export default function Board() {
         setTasks(data);
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("archiveAfterDays");
+    if (stored) setArchiveAfterDays(Number(stored));
+  }, []);
+
+  useEffect(() => {
+    function handleStorage(e: StorageEvent) {
+      if (e.key === "archiveAfterDays" && e.newValue) {
+        setArchiveAfterDays(Number(e.newValue));
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   async function handleAdd(title: string, status: string) {
@@ -186,6 +202,7 @@ export default function Board() {
               title={col.title}
               status={col.status}
               tasks={tasks.filter((t) => t.status === col.status)}
+              archiveAfterDays={col.status === "DONE" ? archiveAfterDays : undefined}
               {...columnProps}
             />
           ))}
@@ -200,6 +217,7 @@ export default function Board() {
             title={col.title}
             status={col.status}
             tasks={tasks.filter((t) => t.status === col.status)}
+            archiveAfterDays={col.status === "DONE" ? archiveAfterDays : undefined}
             {...columnProps}
           />
         ))}

@@ -43,7 +43,9 @@ export default function Board() {
   const [activeTab, setActiveTab] = useState("IN_PROGRESS");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [archiveAfterDays, setArchiveAfterDays] = useState(7);
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => typeof window !== "undefined" && !localStorage.getItem("hasSeenOnboarding")
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -66,17 +68,11 @@ export default function Board() {
   }, []);
 
   useEffect(() => {
-    if (!localStorage.getItem("hasSeenOnboarding")) {
-      setShowOnboarding(true);
-    }
-  }, []);
-
-  useEffect(() => {
     function handleStorage(e: StorageEvent) {
       if (e.key === "archiveAfterDays" && e.newValue) {
         setArchiveAfterDays(Number(e.newValue));
       }
-      if (e.key === "showOnboarding") {
+      if (e.key === "showOnboarding" && e.newValue !== null) {
         setShowOnboarding(true);
       }
     }
@@ -175,7 +171,12 @@ export default function Board() {
     onDelete: handleDelete,
   };
 
-  if (loading) return <BoardSkeleton />;
+  if (loading) return (
+    <>
+      <BoardSkeleton />
+      {showOnboarding && <OnboardingModal onClose={handleOnboardingClose} />}
+    </>
+  );
 
   return (
     <DndContext

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import TaskModal from "./TaskModal";
@@ -20,6 +20,7 @@ type Props = {
   task: Task;
   onUpdate: (id: string, data: Partial<Task>) => void;
   onDelete: (id: string) => void;
+  isSelected?: boolean;
 };
 
 const COLUMN_ORDER = ["BACKLOG", "TODO", "IN_PROGRESS", "REVIEW", "DONE"];
@@ -59,9 +60,14 @@ function formatDuration(from: string, to: string): string {
   return `${Math.floor(days / 30)}mo`;
 }
 
-export default function TaskCard({ task, onUpdate, onDelete }: Props) {
+export default function TaskCard({ task, onUpdate, onDelete, isSelected }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isSelected) cardRef.current?.scrollIntoView({ block: "nearest" });
+  }, [isSelected]);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id });
@@ -89,9 +95,11 @@ export default function TaskCard({ task, onUpdate, onDelete }: Props) {
     <>
       <div ref={setNodeRef} style={style} {...attributes}>
         <div
+          ref={cardRef}
+          data-selected={isSelected || undefined}
           className={`bg-white dark:bg-gray-900 border rounded-lg overflow-hidden hover:shadow-sm transition-all ${
             isDone ? "border-gray-100 dark:border-gray-800 opacity-60" : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
-          }`}
+          } ${isSelected ? "ring-2 ring-slate-500 dark:ring-slate-400" : ""}`}
         >
           <div
             className="px-3 pt-3 pb-2 cursor-grab active:cursor-grabbing"

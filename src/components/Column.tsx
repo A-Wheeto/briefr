@@ -5,6 +5,7 @@ import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useDroppable } from "@dnd-kit/core";
 import TaskCard from "./TaskCard";
 import TaskModal from "./TaskModal";
+import { isArchived } from "@/lib/archive";
 
 type Task = {
   id: string;
@@ -25,6 +26,7 @@ type Props = {
   onUpdate: (id: string, data: Partial<Task>) => void;
   onDelete: (id: string) => void;
   archiveAfterDays?: number;
+  selectedTaskId?: string | null;
 };
 
 const countClasses: Record<string, string> = {
@@ -32,7 +34,7 @@ const countClasses: Record<string, string> = {
   DONE: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-500",
 };
 
-export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete, archiveAfterDays }: Props) {
+export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete, archiveAfterDays, selectedTaskId }: Props) {
   const [adding, setAdding] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [archiveExpanded, setArchiveExpanded] = useState(false);
@@ -40,15 +42,9 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
 
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
-  const thresholdMs = status === "DONE" && archiveAfterDays != null
-    ? archiveAfterDays * 86400000
-    : null;
-  const activeTasks = thresholdMs != null
-    ? tasks.filter(t => !t.completedAt || Date.now() - new Date(t.completedAt).getTime() <= thresholdMs)
-    : tasks;
-  const archivedTasks = thresholdMs != null
-    ? tasks.filter(t => !!t.completedAt && Date.now() - new Date(t.completedAt).getTime() > thresholdMs)
-    : [];
+  const hasArchive = status === "DONE" && archiveAfterDays != null;
+  const activeTasks = hasArchive ? tasks.filter(t => !isArchived(t, archiveAfterDays)) : tasks;
+  const archivedTasks = hasArchive ? tasks.filter(t => isArchived(t, archiveAfterDays)) : [];
 
   function submitAdd() {
     if (newTitle.trim()) onAdd(newTitle.trim(), status);
@@ -78,7 +74,13 @@ export default function Column({ title, status, tasks, onAdd, onUpdate, onDelete
           className={`flex-1 overflow-y-auto p-2 flex flex-col gap-2 transition-colors ${isOver ? "bg-slate-50 dark:bg-gray-800" : ""}`}
         >
           {activeTasks.map((task) => (
-            <TaskCard key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              onUpdate={onUpdate}
+              onDelete={onDelete}
+              isSelected={task.id === selectedTaskId}
+            />
           ))}
         </div>
       </SortableContext>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -17,6 +17,11 @@ import Column from "./Column";
 import TaskCard from "./TaskCard";
 import BoardSkeleton from "./BoardSkeleton";
 import OnboardingModal from "./OnboardingModal";
+import TaskModal from "./TaskModal";
+import QuickAdd from "./QuickAdd";
+import HelpModal from "./HelpModal";
+import useKeyboardShortcuts from "@/hooks/useKeyboardShortcuts";
+import { isArchived } from "@/lib/archive";
 
 type Task = {
   id: string;
@@ -44,6 +49,10 @@ export default function Board() {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [archiveAfterDays, setArchiveAfterDays] = useState(7);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [keyboardTaskId, setKeyboardTaskId] = useState<string | null>(null);
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -170,10 +179,34 @@ export default function Board() {
     handleUpdate(task.id, { status: task.status, position: newPosition });
   }
 
+  const visibleByColumn = useMemo(
+    () =>
+      COLUMNS.map((col) =>
+        tasks.filter(
+          (t) => t.status === col.status && !(col.status === "DONE" && isArchived(t, archiveAfterDays))
+        )
+      ),
+    [tasks, archiveAfterDays]
+  );
+
+  useKeyboardShortcuts({
+    visibleByColumn,
+    selectedTaskId,
+    onSelect: setSelectedTaskId,
+    onClearSelection: () => setSelectedTaskId(null),
+    onOpenTask: setKeyboardTaskId,
+    onQuickAdd: () => setQuickAddOpen(true),
+    onHelp: () => setHelpOpen(true),
+  });
+
+  const selectedTask = tasks.find((t) => t.id === selectedTaskId);
+  const keyboardTask = tasks.find((t) => t.id === keyboardTaskId);
+
   const columnProps = {
     onAdd: handleAdd,
     onUpdate: handleUpdate,
     onDelete: handleDelete,
+    selectedTaskId,
   };
 
   if (loading) return <BoardSkeleton />;
@@ -255,6 +288,26 @@ export default function Board() {
 
     </DndContext>
     {showOnboarding && <OnboardingModal onClose={handleOnboardingClose} />}
+    {quickAddOpen && (
+      <QuickAdd
+        onAdd={(title) => handleAdd(title, "TODO")}
+        onClose={() => setQuickAddOpen(false)}
+      />
+    )}
+    {helpOpen && <HelpModal onClose={() => setHelpOpen(false)} />}
+    {keyboardTask && (
+      <TaskModal
+        task={keyboardTask}
+        onUpdate={handleUpdate}
+        onDelete={handleDelete}
+        onClose={() => setKeyboardTaskId(null)}
+      />
+    )}
+    <div aria-live="polite" className="sr-only">
+      {selectedTask
+        ? `Selected: ${selectedTask.title} (${COLUMNS.find((c) => c.status === selectedTask.status)?.title})`
+        : ""}
+    </div>
     </>
   );
 }

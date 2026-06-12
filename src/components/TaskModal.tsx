@@ -63,6 +63,7 @@ export default function TaskModal({ task, onUpdate, onDelete, onClose }: Props) 
 
   return (
     <div
+      data-modal-root
       className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
       onClick={save}
       onKeyDown={handleKeyDown}

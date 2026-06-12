@@ -16,6 +16,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Column from "./Column";
 import TaskCard from "./TaskCard";
 import BoardSkeleton from "./BoardSkeleton";
+import OnboardingModal from "./OnboardingModal";
 
 type Task = {
   id: string;
@@ -42,6 +43,7 @@ export default function Board() {
   const [activeTab, setActiveTab] = useState("IN_PROGRESS");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [archiveAfterDays, setArchiveAfterDays] = useState(7);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -64,9 +66,18 @@ export default function Board() {
   }, []);
 
   useEffect(() => {
+    if (!localStorage.getItem("hasSeenOnboarding")) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  useEffect(() => {
     function handleStorage(e: StorageEvent) {
       if (e.key === "archiveAfterDays" && e.newValue) {
         setArchiveAfterDays(Number(e.newValue));
+      }
+      if (e.key === "showOnboarding") {
+        setShowOnboarding(true);
       }
     }
     window.addEventListener("storage", handleStorage);
@@ -99,6 +110,11 @@ export default function Board() {
   async function handleDelete(id: string) {
     setTasks((prev) => prev.filter((t) => t.id !== id));
     await fetch(`/api/tasks/${id}`, { method: "DELETE" });
+  }
+
+  function handleOnboardingClose() {
+    localStorage.setItem("hasSeenOnboarding", "true");
+    setShowOnboarding(false);
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -234,6 +250,10 @@ export default function Board() {
           </div>
         )}
       </DragOverlay>
+
+      {showOnboarding && (
+        <OnboardingModal onClose={handleOnboardingClose} />
+      )}
     </DndContext>
   );
 }

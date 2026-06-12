@@ -14,6 +14,7 @@ export default function OnboardingModal({ onClose }: Props) {
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      onKeyDown={e => { if (e.key === "Escape") onClose() }}
     >
       <div
         className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-xl w-full max-w-md flex flex-col"
@@ -24,6 +25,7 @@ export default function OnboardingModal({ onClose }: Props) {
           <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">Welcome to briefr</h2>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

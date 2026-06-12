@@ -51,6 +51,19 @@ export default function UserMenu({ name, email, initials }: Props) {
             {name && <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{name}</p>}
             {email && <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{email}</p>}
           </div>
+          <button
+            onClick={() => {
+              window.dispatchEvent(new StorageEvent("storage", { key: "showOnboarding", newValue: "true" }));
+              setOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors border-b border-gray-100 dark:border-gray-800"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.5"/>
+              <path d="M8 7v5M8 5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            Show welcome guide
+          </button>
           <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between gap-3">
             <span className="text-sm text-gray-600 dark:text-gray-400">Archive after</span>
             <select

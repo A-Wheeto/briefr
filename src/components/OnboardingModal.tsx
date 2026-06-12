@@ -8,7 +8,7 @@ type Props = {
 
 export default function OnboardingModal({ onClose }: Props) {
   const [step, setStep] = useState(0)
-  const totalSteps = 3
+  const totalSteps = 4
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -103,6 +103,33 @@ export default function OnboardingModal({ onClose }: Props) {
                   {" "}button in the header to generate a plain-text summary of what you completed today and yesterday, and what's in progress
                 </li>
                 <li>Copy it to your clipboard for Slack or your daily standup</li>
+              </ul>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div>
+              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">⌨️ Keyboard shortcuts</p>
+              <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                <li>
+                  Use the{" "}
+                  <kbd className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">arrow keys</kbd>
+                  {" "}or{" "}
+                  <kbd className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">h j k l</kbd>
+                  {" "}to move between tasks, and{" "}
+                  <kbd className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">Enter</kbd>
+                  {" "}to open one
+                </li>
+                <li>
+                  Press{" "}
+                  <kbd className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">n</kbd>
+                  {" "}to quickly add a task to Todo
+                </li>
+                <li>
+                  Press{" "}
+                  <kbd className="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded border border-gray-200 dark:border-gray-700">?</kbd>
+                  {" "}any time to see the full list of shortcuts
+                </li>
               </ul>
             </div>
           )}
